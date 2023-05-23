@@ -1,0 +1,129 @@
+# 1
+
+# a.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: webapp
+  name: webapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapp
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - image: nginx
+        name: nginx
+        resources: {}
+status: {}
+---
+# 2
+
+kubectl rollout status deployment webapp
+
+
+
+# $kubectl rollout status deployment webapp
+# Waiting for deployment "webapp" rollout to finish: 1 of 5 updated replicas are available...
+
+# Waiting for deployment "webapp" rollout to finish: 2 of 5 updated replicas are available...
+# Waiting for deployment "webapp" rollout to finish: 3 of 5 updated replicas are available...
+
+# Waiting for deployment "webapp" rollout to finish: 4 of 5 updated replicas are available...
+# deployment "webapp" successfully rolled out
+
+
+# 3
+
+kubectl get ReplicaSet
+
+# 4
+
+
+# deployment.4.rs.yaml
+# deployment.4.pod.yaml
+
+# 5
+
+k delete deployment webapp
+
+# 6
+
+# deployment.6.yaml
+
+# 7
+
+k set image deployment/webapp nginx=nginx:1.17.4
+
+# 8
+
+kubectl rollout history deployment/webapp
+
+# 9
+
+k rollout undo  deployment/webapp --to-revision=1
+
+# 10
+
+k set image deployment/webapp nginx=nginx:1.100
+# a,b OK
+
+# c
+k rollout undo  deployment/webapp --to-revision=3
+
+# d
+
+k rollout history deployment/webapp --revision=4
+
+# deployment.apps/webapp with revision #4
+# Pod Template:
+#   Labels:       app=webapp
+#         pod-template-hash=77b685f94f
+#   Containers:
+#    nginx:
+#     Image:      nginx:1.100
+#     Port:       80/TCP
+#     Host Port:  0/TCP
+#     Environment:        <none>
+#     Mounts:     <none>
+#   Volumes:      <none>
+
+# e
+
+k set image deployment/webapp nginx=nginx:latest
+
+# k rollout history deployment/webapp --revision=6
+
+# deployment.apps/webapp with revision #6
+# Pod Template:
+#   Labels:       app=webapp
+#         pod-template-hash=84bc478888
+#   Containers:
+#    nginx:
+#     Image:      nginx:latest
+#     Port:       80/TCP
+#     Host Port:  0/TCP
+#     Environment:        <none>
+#     Mounts:     <none>
+#   Volumes:      <none>
+
+# 11
+
+# 12
+
+# 13
+k delete deployment webapp
+k delete pod nginx
+
+# 14
+
+
