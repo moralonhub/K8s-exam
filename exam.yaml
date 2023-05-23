@@ -72,3 +72,107 @@ kubectl create service clusterip messaging-service --tcp=6379:6379 -o yaml --dry
 
 #7
 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hr-web-app
+  name: hr-web-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hr-web-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hr-web-app
+    spec:
+      containers:
+      - image: kodekloud/webapp-color
+        name: webapp-color
+        resources: {}
+status: {}
+
+---
+
+#8
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-busybox
+  labels:
+    name: static-busybox
+spec:
+  containers:
+  - name: static-busybox
+    image: busybox
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    command: ["sleep", "1000"]
+
+---
+
+#9
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: finance-mor
+spec: {}
+status: {}
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: temp-bus
+  name: temp-bus
+  namespace: finance-mor
+spec:
+  containers:
+  - image: redis:alpine
+    name: temp-bus
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+
+#10
+
+#TBD
+
+#11
+
+#TBD
+
+#12
+
+#TBD
+
+#13
+
+#13.nginx-deploy-1.yaml
+kubectl set image deployment/nginx-deploy nginx=nginx:1.17
+#13.nginx-deploy-2.yaml
+
+
+---
+
+
+
+
+
+
