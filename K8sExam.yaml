@@ -1,0 +1,320 @@
+
+#1
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: nginx-pod
+  name: nginx-pod
+spec:
+  containers:
+  - image: nginx:alpine
+    name: nginx-pod
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+
+#2
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    tier: msg
+  name: messaging
+spec:
+  containers:
+  - image: redis:alpine
+    name: messaging
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+
+#3
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: apx-x998-mor
+spec: {}
+status: {}
+
+---
+
+#4
+
+kubectl get nodes -o json > /tmp/nodes-mor
+
+#nodes-mor
+
+---
+
+#5
+
+kubectl create service clusterip messaging-service --tcp=6379:6379 -o yaml --dry-run=client | kubectl set selector --local -f- 'tier=msg' -o yaml | kubectl create -f -
+
+---
+
+#6
+
+#service.yaml
+
+---
+
+#7
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: hr-web-app
+  name: hr-web-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hr-web-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: hr-web-app
+    spec:
+      containers:
+      - image: kodekloud/webapp-color
+        name: webapp-color
+        resources: {}
+status: {}
+
+---
+
+#8
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: static-busybox
+  labels:
+    name: static-busybox
+spec:
+  containers:
+  - name: static-busybox
+    image: busybox
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    command: ["sleep", "1000"]
+
+---
+
+#9
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  creationTimestamp: null
+  name: finance-mor
+spec: {}
+status: {}
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: temp-bus
+  name: temp-bus
+  namespace: finance-mor
+spec:
+  containers:
+  - image: redis:alpine
+    name: temp-bus
+    resources: {}
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
+
+---
+
+#10
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-analytics
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /pv/data-analytics
+
+---
+ 
+#11
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-storage-mor
+  labels:
+    name: redis-storage-mor
+spec:
+  containers:
+  - name: redis
+    image: redis:alpine
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    volumeMounts:
+        - name: redis-storage
+          mountPath: /data/redis
+  volumes:
+    - name: redis-storage
+      emptyDir: {}
+
+---
+
+#12
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-1
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: use-pvspec-mor
+  hostPath:
+    path: /data
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  storageClassName: use-pvspec-mor
+  volumeName: pv-1
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: use-pvspec-mor
+  creationTimestamp: null
+  labels:
+    run: use-pv
+    name: use-pvspec-mor
+spec:
+  containers:
+  - name: use-pv
+    image: nginx
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    volumeMounts:
+        - name: site-data
+          mountPath: /data
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  volumes:
+    - name: site-data
+      persistentVolumeClaim:
+        claimName: pvc-1
+status: {}
+  
+
+
+---
+
+#13  
+
+#13.nginx-deploy-1.yaml
+kubectl set image deployment/nginx-deploy nginx=nginx:1.17
+#13.nginx-deploy-2.yaml
+
+---
+
+#14
+
+
+#TBD
+
+#15
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-critical
+  labels:
+    name: nginx-critical
+spec:
+  nodeName: node01
+  restartPolicy: OnFailure
+  containers:
+  - name: nginx-critical
+    image: nginx
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+---
+
+#16
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-pod
+  labels:
+    name: multi-pod
+spec:
+  containers:
+  - name: alpha
+    image: nginx
+    env:
+    - name: name
+      value: alpha
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+  - name: beta
+    image: busybox
+    env:
+    - name: name
+      value: beta
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    command: ["sleep", "4800"]
+
+
