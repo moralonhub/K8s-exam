@@ -69,3 +69,40 @@ done
 
 # 14
 
+$k get nodes --show-labels
+
+# 15
+
+k label node k3d-dev-agent-0 nodeName=nginxnode
+
+# 16
+
+---
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    run: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+  dnsPolicy: ClusterFirst
+  restartPolicy: Never
+  nodeSelector:
+    nodeName: nginxnode
+
+---
+
+# 17
+
+$k get pods -o wide
+
+# 18
+$k get pods --show-labels
