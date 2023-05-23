@@ -1,0 +1,71 @@
+# 1 
+k get pods --show-labels
+# 2
+for i in {1..5}; do
+  pod_name="nginx-pod-$i"
+  if (( $i % 2 == 0 )); then
+    label="env=prod"
+  else
+    label="env=dev"
+  fi
+  kubectl run $pod_name --image=nginx --labels=$label
+done
+
+# 3
+
+nginx-pod-1                  1/1     Running   0                2m7s    env=dev
+nginx-pod-5                  1/1     Running   0                2m7s    env=dev
+nginx-pod-2                  1/1     Running   0                2m7s    env=prod
+nginx-pod-4                  1/1     Running   0                2m7s    env=prod
+nginx-pod-3                  1/1     Running   0                2m7s    env=dev
+
+# 4
+
+k get pods -l env=dev
+
+# 5
+
+k get pods -l env=dev --show-labels
+
+# 6
+
+k get pods -l env=prod
+
+# 7
+
+k get pods -l env=prod --show-labels
+
+# 8
+
+k get pods -l env
+
+# 9
+
+kubectl get pods --selector='env in (dev,prod)'
+
+# 10
+
+kubectl get pods --selector='env in (dev,prod)' --show-labels
+
+# 11
+
+kubectl label pod nginx-pod-1 env=uat
+k get pods
+
+# 12
+
+
+for i in {1..5}; do
+  pod_name="nginx-pod-$i"
+  kubectl label pod $pod_name  env-
+done
+
+# 13
+
+for i in {1..5}; do
+  pod_name="nginx-pod-$i"
+  kubectl label pod $pod_name  app=nginx
+done
+
+# 14
+
