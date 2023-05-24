@@ -1,4 +1,11 @@
 
+
+# 1
+# config.txt
+
+
+# 2
+
 # kubectl create configmap keyvalcfgmap --from-env-file config.txt
 
 apiVersion: v1
@@ -13,3 +20,6 @@ metadata:
   resourceVersion: "57162"
   uid: 0e4e7707-7b88-4c80-bec9-2501950e38f0
 
+# 3
+
+# nginx-pod.yml
