@@ -264,8 +264,11 @@ kubectl set image deployment/nginx-deploy nginx=nginx:1.17
 
 #14
 
+# ex14.yaml
 
-#TBD
+#k exec -it busybox -- nslookup nginx-resolver
+#Server:    10.43.0.10
+#Address 1: 10.43.0.10 kube-dns.kube-system.svc.cluster.local
 
 #15
 
